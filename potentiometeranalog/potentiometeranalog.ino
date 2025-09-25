@@ -7,8 +7,10 @@ pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() {
+  // analog btn 0 to 255 
   // 0 to 1200
  Serial.println(analogRead(POTENTIONMETER_PIN));
- analogWrite(LED_PIN, analogRead(POTENTIONMETER_PIN));
+
+ analogWrite(LED_PIN, analogRead(POTENTIONMETER_PIN) / 4);
  delay(100);
 }

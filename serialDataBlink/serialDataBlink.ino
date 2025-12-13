@@ -1,6 +1,7 @@
 // #define POTENTIONMETER_PIN A2
 // #define BTN_PIN 9
 #define RED_LED_PIN 12
+int BLINKSPEED = 800;
 // #define GREEN_LED_PIN 11
 // #define YELLOW_LED_PIN 10
 // #define LED_PIN_ARRAY_SIZE 3
@@ -24,10 +25,14 @@ void blink(int value){
 }
 
 void loop() {
+blink(BLINKSPEED);
 
   if(Serial.availableForWrite() > 0){
       int pause = Serial.parseInt();
-       blink(pause);
+      if (pause >= 100){
+         BLINKSPEED = pause;
+      }
+      
     }
   
 }

@@ -1,47 +1,68 @@
 // #define POTENTIONMETER_PIN A2
-// #define BTN_PIN 9
+#define BTN_PIN 9
 #define RED_LED_PIN 12
-int BLINKSPEED = 800;
-// #define GREEN_LED_PIN 11
-// #define YELLOW_LED_PIN 10
-// #define LED_PIN_ARRAY_SIZE 3
-unsigned long previousActionTime = millis();
-unsigned long timeInterruptInterval = 3000;
+int RED_BLINKSPEED = 800;
+#define GREEN_LED_PIN 11
+int GREEN_BLINKSPEED = 1000;
+#define YELLOW_LED_PIN 10
+#define LED_PIN_ARRAY_SIZE 3
+unsigned long previousRedBlinkInterval = millis();
+unsigned long previousGreenBlinkInterval = millis();
+
+byte LED_PINS[LED_PIN_ARRAY_SIZE] = {RED_LED_PIN, GREEN_LED_PIN, YELLOW_LED_PIN};
 
 void setup() {
-
-  pinMode(RED_LED_PIN,OUTPUT);
-  digitalWrite(RED_LED_PIN, LOW);
+  setupLEDS();
   Serial.begin(115200);
-  // time the program started in milis - unsigned start only at positive 
+ 
   
 }
 
-unsigned long getActionDuration(unsigned long start, unsigned long end){
-  return end-start;
+void setupLEDS(){
+  pinMode(BTN_PIN, INPUT);
+  for(int i=0; i < LED_PIN_ARRAY_SIZE; i++){
+    pinMode(LED_PINS[i], OUTPUT);
+    digitalWrite(LED_PINS[i], LOW);
+  }
+
+}
+void blinkRed(unsigned long timeNow){
+  if (timeNow - previousRedBlinkInterval > RED_BLINKSPEED){
+    if(digitalRead(RED_LED_PIN) == LOW){
+      digitalWrite(RED_LED_PIN, HIGH);
+    } else {
+      digitalWrite(RED_LED_PIN, LOW);
+    }
+
+  previousRedBlinkInterval += RED_BLINKSPEED;
+  }
+
 }
 
-void blink(int value){
-  digitalWrite(RED_LED_PIN, HIGH);
-  delay(value);
-   digitalWrite(RED_LED_PIN, LOW);
+void blinkGreen(unsigned long timeNow){
+  if (timeNow - previousGreenBlinkInterval > GREEN_BLINKSPEED){
+    if(digitalRead(GREEN_LED_PIN) == LOW){
+      digitalWrite(GREEN_LED_PIN, HIGH);
+    } else {
+      digitalWrite(GREEN_LED_PIN, LOW);
+    }
+  previousGreenBlinkInterval += GREEN_BLINKSPEED;
+  }
+
+}
+void checkButtonInput(){
+  if(digitalRead(BTN_PIN) == HIGH){
+    digitalWrite(YELLOW_LED_PIN, HIGH);
+  }else{
+   digitalWrite(YELLOW_LED_PIN, LOW); 
+  }
 }
 
 void loop() {
 unsigned long timeNow = millis();
-if (timeNow - previousActionTime > timeInterruptInterval){
-  Serial.println("Hello");
-  Serial.println(millis());
-  previousActionTime += timeInterruptInterval ;
-}
-// blink(BLINKSPEED);
+blinkRed(timeNow);
+blinkGreen(timeNow);
+checkButtonInput();
 
-//   if(Serial.availableForWrite() > 0){
-//       int pause = Serial.parseInt();
-//       if (pause >= 100){
-//          BLINKSPEED = pause;
-//       }
-      
-//     }
-  
+
 }

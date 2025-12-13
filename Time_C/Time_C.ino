@@ -1,4 +1,4 @@
-// #define POTENTIONMETER_PIN A2
+#define POTENTIONMETER_PIN A2
 #define BTN_PIN 9
 #define RED_LED_PIN 12
 int RED_BLINKSPEED = 800;
@@ -50,6 +50,12 @@ void blinkGreen(unsigned long timeNow){
   }
 
 }
+
+int pValue = analogRead(POTENTIONMETER_PIN);
+int pwmValue = map(pValue, 0, 1023, 0, 255);
+analogWrite(GREEN_LED_PIN, pwmValue);
+
+
 void checkButtonInput(){
   if(digitalRead(BTN_PIN) == HIGH){
     digitalWrite(YELLOW_LED_PIN, HIGH);
@@ -61,7 +67,8 @@ void checkButtonInput(){
 void loop() {
 unsigned long timeNow = millis();
 blinkRed(timeNow);
-blinkGreen(timeNow);
+// blinkGreen(timeNow);
+checkPotentionmeter();
 checkButtonInput();
 
 

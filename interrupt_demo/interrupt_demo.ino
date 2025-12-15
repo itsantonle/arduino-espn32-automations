@@ -4,6 +4,7 @@ byte LED_STATE = LOW;
 volatile bool btnReleased = false;
 unsigned long lastTimePressed = millis(); 
 unsigned long debounceDelay = 50; 
+int counter = 0; 
 
 void toggleLED(){
   if (LED_STATE == LOW){
@@ -19,11 +20,13 @@ void buttonReleasedInterrupt(){
   	unsigned long timeNow = millis();
   if (timeNow - lastTimePressed > debounceDelay) {
     btnReleased = true; 
+    counter += 1; 
+    Serial.println(counter); 
   }
 	
 }
 void setup()
-{
+{ Serial.begin(9600); 
   pinMode(LED_PIN, OUTPUT);
   pinMode(BTN_PIN, INPUT); 
  

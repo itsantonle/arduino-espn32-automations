@@ -4,6 +4,7 @@
 
 
 
+unsigned long timeBegin = micros();  
 unsigned long lastTimeUltrasonicTrigger = millis();
 unsigned long triggerDebounceInterval = 100; 
 
@@ -20,7 +21,11 @@ void triggerUltrasonicSensor(){
 double getUltrasonicDistance(){
   // get using the pulse in (PIN, MODE (High if high in 10micros))
   // distance = duration(t) * speed (of air = 340m/s) t * d/t = d 
+  unsigned long timeNowMicro = micros();
   double durationMicros = pulseIn(ECHO_PIN, HIGH);  
+  unsigned long startPulsetime = timeBegin - timeNowMicro; 
+  Serial.println("Duration"); 
+  Serial.print(startPulsetime);
   double distanceCenti = durationMicros / 58.0;  // if inch, d/148.0
   return distanceCenti; 
 

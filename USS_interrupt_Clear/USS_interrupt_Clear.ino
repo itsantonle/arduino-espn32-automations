@@ -6,6 +6,10 @@ unsigned long ultrasonicDelay = 100;
 volatile unsigned long pulseInTimeBegin; 
 volatile unsigned long pulseInTimeEnd; 
 volatile bool newDistanceAvailable; 
+double previousDistance = 400; 
+
+// Applying filters to distance to reduce wrong data (depends on hardware )
+
 
 void triggerUltrasonicSensor(){
   // send pulse to trigger sensor
@@ -20,6 +24,11 @@ void triggerUltrasonicSensor(){
 double getUltrasonicDistance(){
    double durationMicros = pulseInTimeEnd - pulseInTimeBegin; 
    double distanceCenti = durationMicros/58.0; 
+   // add the filters
+   if (distanceCenti > 400){
+    return previousDistance;
+   }
+   previousDistance = distanceCenti; 
    return distanceCenti;
 }
 

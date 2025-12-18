@@ -14,6 +14,10 @@
 unsigned long timeBegin = micros();  
 unsigned long lastTimeUltrasonicTrigger = millis();
 unsigned long triggerDebounceInterval = 100; 
+volatile unsigned long pulseInTimeBegin; 
+volatile unsigned long pulseInTimeEnd; 
+volatile bool newDistanceAvailable; 
+
 unsigned long lastledBlink = millis(); 
 unsigned long ledBlinkInterval = 500; 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -39,12 +43,21 @@ void triggerUltrasonicSensor(){
 }
 
 double getUltrasonicDistance(){
-  unsigned long timeNowMicro = micros();
-  double durationMicros = pulseIn(ECHO_PIN, HIGH);  
-  unsigned long startPulsetime = timeBegin - timeNowMicro; 
+  
+  double durationMicros = pulseInTimeEnd - pulseInTimeBegin;  
   double distanceCenti = durationMicros / 58.0;  // if inch, d/148.0
   return distanceCenti; 
 
+}
+
+void ultraSonicInterrupt(){
+  // this is a change so check both rising and falling modes 
+  if(digitalRead(ECHO_PIN) == HIGH){
+    pulseInTimeBegin = micros();
+  } else{
+    pulseInTimeEnd = micros();
+    newDistanceAvailable = true; 
+  }
 }
 
 void setupPins(){
@@ -60,6 +73,7 @@ delay(1000);
 digitalWrite(GREEN_LED_PIN, LOW);
 
 }
+
 void setupLCD(){
   lcd.init();          
   lcd.backlight();     
@@ -76,15 +90,13 @@ void setup() {
   setupLCD(); 
   delay(1000);
   Serial.begin(115200);
-  
- 
 }
 
 void setDistancetoLCD(double distance){
   lcd.setCursor(0, 1);         
-  lcd.print("                "); // Clear full line (16 spaces)
+  lcd.print("                "); 
   lcd.setCursor(0, 1);
-  lcd.print(String(distance, 2)); // Format to 2 decimal places
+  lcd.print(String(distance, 2)); 
   lcd.print(" cm");
 }
 
@@ -97,9 +109,11 @@ void loop() {
     lastTimeUltrasonicTrigger += triggerDebounceInterval; 
     //trigger sensor 
     triggerUltrasonicSensor();
-    // read pulse on echo pin
-    setDistancetoLCD(getUltrasonicDistance());
-    // Serial.println("\nDistance: ");
-    // Serial.print(getUltrasonicDistance());
+    if (newDistanceAvailable){
+      newDistanceAvailable = false; 
+      setDistancetoLCD(getUltrasonicDistance());
+    }
+   
+   
   }
 }

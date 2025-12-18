@@ -13,10 +13,11 @@
 
 unsigned long timeBegin = micros();  
 unsigned long lastTimeUltrasonicTrigger = millis();
-unsigned long triggerDebounceInterval = 100; 
+unsigned long triggerDebounceInterval = 600; 
 volatile unsigned long pulseInTimeBegin; 
 volatile unsigned long pulseInTimeEnd; 
 volatile bool newDistanceAvailable; 
+double previousDistance = 400; 
 
 unsigned long lastledBlink = millis(); 
 unsigned long ledBlinkInterval = 500; 
@@ -46,7 +47,11 @@ double getUltrasonicDistance(){
   
   double durationMicros = pulseInTimeEnd - pulseInTimeBegin;  
   double distanceCenti = durationMicros / 58.0;  // if inch, d/148.0
-  return distanceCenti; 
+   if (distanceCenti > 400){
+    return previousDistance;
+   }
+   previousDistance = distanceCenti; 
+   return distanceCenti; 
 
 }
 
@@ -90,6 +95,8 @@ void setup() {
   setupLCD(); 
   delay(1000);
   Serial.begin(115200);
+  attachInterrupt(digitalPinToInterrupt(ECHO_PIN), ultraSonicInterrupt, CHANGE);
+
 }
 
 void setDistancetoLCD(double distance){
@@ -109,8 +116,10 @@ void loop() {
     lastTimeUltrasonicTrigger += triggerDebounceInterval; 
     //trigger sensor 
     triggerUltrasonicSensor();
+    
     if (newDistanceAvailable){
       newDistanceAvailable = false; 
+      Serial.println(getUltrasonicDistance());
       setDistancetoLCD(getUltrasonicDistance());
     }
    

@@ -3,6 +3,7 @@
 //UDP allow OTA(over the air) happenings
 #include <WiFiUDP.h> 
 // allow arduino IDE to connect to ESP OTA (no USB) 
+// if over the internet compile to binary and host it on a server
 // alwyas include OTA code otherwise connection is severed
 #include <ArduinoOTA.h>
 #include <WiFiManager.h>
